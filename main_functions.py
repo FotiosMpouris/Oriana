@@ -137,17 +137,16 @@ class Oriana:
         sorted_results = sorted(combined_results, key=lambda x: x['published_date'], reverse=True)[:max_articles]
         return sorted_results
 
-    def summarize_articles(self, articles, max_articles=1):
+    def summarize_articles(self, articles, max_articles=10):
         summaries = []
         for article in articles[:max_articles]:
             try:
                 prompt = f"""Summarize the following article in 2-3 paragraphs:
 
                 Title: {article['title']}
-                Content: {article['content'][:3000]}  # Use the first 9000 characters of the full content
+                Content: {article['content'][:3000]}  # Use the first 3000 characters of the full content
 
-                Provide a concise summary that captures the main points of the article. Include 10 bullet points
-                that represent the main topics of the article.
+                Provide a concise summary that captures the main points of the article. 
                 If the content seems incomplete or irrelevant, mention this in your summary."""
                 
                 summary = self.investigative_journalist_agent(prompt)
