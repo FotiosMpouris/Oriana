@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import re
 from datetime import datetime
 import json
+import xmltodict
 
 # Load environment variables and initialize clients
 load_dotenv()
@@ -35,6 +36,37 @@ class Oriana:
     def save_sources(self):
         with open('sources.json', 'w') as f:
             json.dump(self.sources, f)
+
+    def getRSS(self, url: str) -> dict:
+        response = requests.get(url)
+        return xmltodict.parse(response.content)
+
+    def search_rss_feed(self, query, source):
+        try:
+            rss_data = self.getRSS(source)
+            articles = rss_data['rss']['channel']['item']
+            
+            matching_articles = []
+            for article in articles:
+                if query.lower() in article['title'].lower() or query.lower() in article['description'].lower():
+                    matching_articles.append({
+                        'title': article['title'],
+                        'url': article['link'],
+                        'content': article['description'],
+                        'published_date': article.get('pubDate', datetime.now().isoformat()),
+                        'source': source
+                    })
+            
+            return matching_articles
+        except Exception as e:
+            print(f"Error searching RSS feed {source}: {str(e)}")
+            return []
+
+    def get_recent_articles(self, subject, source):
+        if source.endswith('.xml'):  # Assume it's an RSS feed if it ends with .xml
+            return self.search_rss_feed(subject, source)
+        else:
+            return super().get_recent_articles(subject, source)
 
     def search_source(self, query, source):
         try:
