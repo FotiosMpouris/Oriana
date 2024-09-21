@@ -41,22 +41,12 @@ if 'selected_answers' not in st.session_state:
 
 # Interactive Q&A
 st.header("Ask Questions About the News")
-search_option = st.radio("Search option:", ["Selected Sources", "All Sources", "General Search"])
-
-if search_option == "Selected Sources":
-    selected_sources = st.multiselect("Select sources:", oriana.sources)
-elif search_option == "All Sources":
-    selected_sources = oriana.sources
-else:
-    selected_sources = []
+selected_source = st.selectbox("Select source:", oriana.sources)
 
 user_question = st.text_input("Ask any question about recent news:")
 if user_question and user_question.lower() != 'exit':
     with st.spinner("Investigating..."):
-        if search_option == "General Search":
-            answer = oriana.answer_question(user_question, [])
-        else:
-            answer = oriana.answer_question(user_question, selected_sources)
+        answer = oriana.answer_question(user_question, selected_source)
     st.subheader("Expert Answer")
     st.write(answer)
     
@@ -88,16 +78,13 @@ if st.button("Generate Transcript"):
 
 st.header("Search Recent Articles")
 search_subject = st.text_input("Enter a subject to search for recent articles:")
-search_sources = st.multiselect("Select news sources for recent articles:", oriana.sources)
+search_source = st.selectbox("Select news source for recent articles:", oriana.sources)
 max_articles = st.slider("Maximum number of articles to summarize", min_value=1, max_value=10, value=5)
 
 if st.button("Search and Summarize Recent Articles"):
     with st.spinner("Searching for and summarizing recent articles..."):
         try:
-            if search_sources:
-                recent_articles = oriana.get_recent_articles(search_subject, search_sources)
-            else:
-                recent_articles = oriana.get_recent_articles(search_subject, oriana.sources)
+            recent_articles = oriana.get_recent_articles(search_subject, search_source)
             
             if not recent_articles:
                 st.warning("No articles found. Try different search terms or sources.")
@@ -115,13 +102,10 @@ if st.button("Search and Summarize Recent Articles"):
 
 # Search Top Stories
 st.header("Search Top Stories")
-search_sources_top = st.multiselect("Select news sources for top stories:", oriana.sources)
+search_source_top = st.selectbox("Select news source for top stories:", oriana.sources)
 if st.button("Search Top Stories"):
     with st.spinner("Searching for top stories..."):
-        if search_sources_top:
-            top_stories = oriana.get_top_stories_from_sources(search_sources_top)
-        else:
-            top_stories = oriana.get_top_stories_from_sources(oriana.sources)
+        top_stories = oriana.get_top_stories_from_source(search_source_top)
     st.subheader("Top Stories")
     for story in top_stories:
         st.write(f"- [{story['title']}]({story['url']}) (Published: {story['published_date']}) (Source: {story['source']})")
