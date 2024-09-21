@@ -37,7 +37,7 @@ class Oriana:
             json.dump(self.sources, f)
 
     def add_source(self, url):
-        if url not in self.sources:
+        if url and url not in self.sources:
             self.sources.append(url)
             self.save_sources()
 
@@ -45,6 +45,27 @@ class Oriana:
         if url in self.sources:
             self.sources.remove(url)
             self.save_sources()
+    
+    # def load_sources(self):
+    #     try:
+    #         with open('sources.json', 'r') as f:
+    #             self.sources = json.load(f)
+    #     except FileNotFoundError:
+    #         self.sources = []
+
+    # def save_sources(self):
+    #     with open('sources.json', 'w') as f:
+    #         json.dump(self.sources, f)
+
+    # def add_source(self, url):
+    #     if url not in self.sources:
+    #         self.sources.append(url)
+    #         self.save_sources()
+
+    # def remove_source(self, url):
+    #     if url in self.sources:
+    #         self.sources.remove(url)
+    #         self.save_sources()
 
     def load_resources(self):
         try:
