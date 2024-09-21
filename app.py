@@ -10,20 +10,20 @@ st.markdown("""
     <h3 style='font-size: 1.5em; font-weight: normal;'>Your AI-Powered Investigative Journalist</h3>
     """, unsafe_allow_html=True)
 
-# Sidebar content
 st.sidebar.header("Manage News Sources")
 new_source = st.sidebar.text_input("Enter a new source URL:")
 if st.sidebar.button("Add Source"):
     oriana.add_source(new_source)
     st.sidebar.success(f"Added source: {new_source}")
+    st.experimental_rerun()
 
 # Display current sources with remove option
 st.sidebar.subheader("Current Sources")
-for source in oriana.sources:
+for idx, source in enumerate(oriana.sources):
     col1, col2 = st.sidebar.columns([3, 1])
     col1.text(source)
-    if col2.button("Remove", key=f"remove_{source}"):
-        if st.sidebar.button(f"Confirm removal of {source}", key=f"confirm_{source}"):
+    if col2.button("Remove", key=f"remove_{idx}"):
+        if st.sidebar.button(f"Confirm removal of {source}", key=f"confirm_{idx}"):
             oriana.remove_source(source)
             st.sidebar.success(f"Removed source: {source}")
             st.experimental_rerun()
