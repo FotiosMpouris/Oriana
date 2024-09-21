@@ -40,55 +40,21 @@ class Oriana:
         with open('sources.json', 'w') as f:
             json.dump(self.sources, f)
 
-    def search_sources(self, query, sources):
-        results = []
-        for url in sources:
-            try:
-                result = exa_client.search_and_contents(
-                    f"{query} from {url}",
-                    num_results=5,
-                    use_autoprompt=True
-                )
-                results.extend([{
-                    'url': item.url,
-                    'content': item.title,
-                    'timestamp': item.published_date
-                } for item in result.results if url in item.url])
-            except Exception as e:
-                print(f"Error searching {url}: {str(e)}")
-        return results
-    #new search def to handle the gereral search
-    def general_search(self, query):
+    def search_source(self, query, source):
         try:
             result = exa_client.search_and_contents(
-                query,
+                f"{query} from {source}",
                 num_results=5,
                 use_autoprompt=True
             )
-            return [{'url': item.url, 'content': item.title, 'timestamp': item.published_date} for item in result.results]
+            return [{
+                'url': item.url,
+                'content': item.title,
+                'timestamp': item.published_date
+            } for item in result.results if source in item.url]
         except Exception as e:
-            print(f"Error in general search: {str(e)}")
+            print(f"Error searching {source}: {str(e)}")
             return []
-
-
-    def search_all_sources(self, query, limit=20):
-        combined_results = []
-        for url in self.sources:
-            try:
-                result = exa_client.search_and_contents(
-                    f"{query} from {url}",
-                    num_results=limit,
-                    use_autoprompt=True
-                )
-                combined_results.extend([{
-                    'title': item.title,
-                    'url': item.url,
-                    'published_date': item.published_date,
-                    'source': url
-                } for item in result.results])
-            except Exception as e:
-                st.error(f"Error searching {url}: {str(e)}")
-        return combined_results
 
     def scrape_specific_url(self, url):
         headers = {
@@ -99,14 +65,10 @@ class Oriana:
             response.raise_for_status()
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # Remove scripts, styles, and other non-content elements
             for script in soup(["script", "style", "meta", "noscript", "header", "footer"]):
                 script.decompose()
             
-            # Extract text from paragraphs and other relevant tags
             content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
-            
-            # Clean up whitespace
             content = re.sub(r'\s+', ' ', content).strip()
             
             return content
@@ -114,28 +76,23 @@ class Oriana:
             print(f"Error scraping {url}: {str(e)}")
             return f"Unable to retrieve content from {url}"
 
-    def get_recent_articles(self, subject, sources, max_articles=10):
-        combined_results = []
-        for url in sources:
-            try:
-                result = exa_client.search_and_contents(
-                    f"Recent articles about {subject} from {url}",
-                    num_results=max_articles,
-                    use_autoprompt=True
-                )
-                combined_results.extend([{
-                    'title': item.title,
-                    'url': item.url,
-                    'content': item.text,
-                    'published_date': item.published_date,
-                    'source': url
-                } for item in result.results])
-            except Exception as e:
-                st.error(f"Error searching {url}: {str(e)}")
-        
-        # Sort results by published date (most recent first) and limit to max_articles
-        sorted_results = sorted(combined_results, key=lambda x: x['published_date'], reverse=True)[:max_articles]
-        return sorted_results
+    def get_recent_articles(self, subject, source, max_articles=10):
+        try:
+            result = exa_client.search_and_contents(
+                f"Recent articles about {subject} from {source}",
+                num_results=max_articles,
+                use_autoprompt=True
+            )
+            return [{
+                'title': item.title,
+                'url': item.url,
+                'content': item.text,
+                'published_date': item.published_date,
+                'source': source
+            } for item in result.results]
+        except Exception as e:
+            st.error(f"Error searching {source}: {str(e)}")
+            return []
 
     def summarize_articles(self, articles, max_articles=10):
         summaries = []
@@ -144,7 +101,7 @@ class Oriana:
                 prompt = f"""Summarize the following article in 2-3 paragraphs:
 
                 Title: {article['title']}
-                Content: {article['content'][:3000]}  # Use the first 3000 characters of the full content
+                Content: {article['content'][:3000]}
 
                 Provide a concise summary that captures the main points of the article. 
                 If the content seems incomplete or irrelevant, mention this in your summary."""
@@ -161,69 +118,49 @@ class Oriana:
                 print(f"Error summarizing article {article['url']}: {str(e)}")
         return summaries
 
-    def answer_question(self, question, selected_sources):
-        if not selected_sources:
-            combined_results = self.general_search(question)
-        else:
-            combined_results = self.search_sources(question, selected_sources)
+    def answer_question(self, question, source):
+        if not source:
+            return f"No source selected. Please select a source to search."
         
-        if not combined_results:
-            return f"No recent news stories found for the given query."
+        results = self.search_source(question, source)
+        
+        if not results:
+            return f"No recent news stories found from the selected source ({source})."
     
-        prompt = f"""Based on the following recent news:
+        prompt = f"""Based on the following recent news from {source}:
 
-        {'\n'.join([f"From {r['url']}:\n{r['content']}" for r in combined_results])}
+        {'\n'.join([f"From {r['url']}:\n{r['content']}" for r in results])}
 
         Answer the following question: {question}
 
         If the information provided is not sufficient to answer the question, provide a summary of the recent news instead."""
 
-        return self.investigative_journalist_agent(prompt)    
-    # def answer_question(self, question, selected_sources):
-    #     combined_results = self.search_sources(question, selected_sources)
-    #     if not combined_results:
-    #         return f"No recent news stories found from the selected sources ({', '.join(selected_sources)})."
-        
-    #     prompt = f"""Based on the following recent news from {', '.join(selected_sources)}:
+        return self.investigative_journalist_agent(prompt)
 
-    # {'\n'.join([f"From {r['url']}:\n{r['content']}" for r in combined_results])}
-
-    # Answer the following question: {question}
-
-    # If the information provided is not sufficient to answer the question, provide a summary of the recent news instead."""
-
-    #     return self.investigative_journalist_agent(prompt)
-
-    
-
-    def get_top_stories_from_sources(self, source_urls, limit=5):
-        combined_results = []
-        for url in source_urls:
-            try:
-                result = exa_client.search_and_contents(
-                    f"Top stories from {url}",
-                    num_results=limit,
-                    use_autoprompt=True
-                )
-                combined_results.extend([{
-                    'title': item.title,
-                    'url': item.url,
-                    'published_date': item.published_date,
-                    'source': url
-                } for item in result.results])
-            except Exception as e:
-                st.error(f"Error searching {url}: {str(e)}")
-        return combined_results
+    def get_top_stories_from_source(self, source_url, limit=5):
+        try:
+            result = exa_client.search_and_contents(
+                f"Top stories from {source_url}",
+                num_results=limit,
+                use_autoprompt=True
+            )
+            return [{
+                'title': item.title,
+                'url': item.url,
+                'published_date': item.published_date,
+                'source': source_url
+            } for item in result.results]
+        except Exception as e:
+            st.error(f"Error searching {source_url}: {str(e)}")
+            return []
 
     def generate_news_transcript(self, selected_answers, max_answers=5):
         transcript = "News Transcript:\n\n"
         for i, answer in enumerate(selected_answers[:max_answers], 1):
             transcript += f"Story {i}:\n{answer}\n\n"
         
-        # Generate a summarized script
         script = self.generate_summary_script(selected_answers[:max_answers])
         
-        # Combine transcript and script
         full_content = f"{transcript}\nSummarized Script:\n\n{script}"
         
         return full_content
@@ -245,11 +182,6 @@ class Oriana:
         Keep the script concise, around 200-300 words, and suitable for reading aloud."""
 
         return self.investigative_journalist_agent(prompt)
-    # def generate_news_transcript(self, selected_answers, max_answers=5):
-    #     transcript = "News Transcript:\n\n"
-    #     for i, answer in enumerate(selected_answers[:max_answers], 1):
-    #         transcript += f"Story {i}:\n{answer}\n\n"
-    #     return transcript
 
     def investigative_journalist_agent(self, prompt):
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
