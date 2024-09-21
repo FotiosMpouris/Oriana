@@ -10,3 +10,4 @@ numpy>=1.21.0
 xmltodict==0.13.0
 newspaper3k==0.2.8
 nltk==3.6.5
+lxml[html_clean]>=4.9.3
