@@ -75,10 +75,15 @@ if st.button("Generate Transcript"):
         )
     else:
         st.warning("Please add some answers to the transcript first.")
-
 st.header("Search Recent Articles")
 search_subject = st.text_input("Enter a subject to search for recent articles:")
-search_source = st.selectbox("Select news source for recent articles:", oriana.sources)
+search_source_type = st.radio("Select source type:", ["RSS Feed", "Website"])
+
+if search_source_type == "RSS Feed":
+    search_source = st.text_input("Enter RSS feed URL (must end with .xml):")
+else:
+    search_source = st.selectbox("Select news source for recent articles:", oriana.sources)
+
 max_articles = st.slider("Maximum number of articles to summarize", min_value=1, max_value=10, value=5)
 
 if st.button("Search and Summarize Recent Articles"):
@@ -99,6 +104,29 @@ if st.button("Search and Summarize Recent Articles"):
                     st.write("---")
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
+# st.header("Search Recent Articles")
+# search_subject = st.text_input("Enter a subject to search for recent articles:")
+# search_source = st.selectbox("Select news source for recent articles:", oriana.sources)
+# max_articles = st.slider("Maximum number of articles to summarize", min_value=1, max_value=10, value=5)
+
+# if st.button("Search and Summarize Recent Articles"):
+#     with st.spinner("Searching for and summarizing recent articles..."):
+#         try:
+#             recent_articles = oriana.get_recent_articles(search_subject, search_source)
+            
+#             if not recent_articles:
+#                 st.warning("No articles found. Try different search terms or sources.")
+#             else:
+#                 summarized_articles = oriana.summarize_articles(recent_articles, max_articles)
+                
+#                 st.subheader(f"Recent Articles about '{search_subject}' (Summarized)")
+#                 for article in summarized_articles:
+#                     st.write(f"### [{article['title']}]({article['url']})")
+#                     st.write(f"**Published:** {article['published_date']} | **Source:** {article['source']}")
+#                     st.write(f"**Summary:** {article['summary']}")
+#                     st.write("---")
+#         except Exception as e:
+#             st.error(f"An error occurred: {str(e)}")
 
 # Search Top Stories
 st.header("Search Top Stories")
