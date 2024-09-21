@@ -163,7 +163,7 @@ class Oriana:
         3. Connect any common themes or related information across the stories
         4. Conclude with a thought-provoking statement or question
 
-        Keep the script concise, around 200-300 words, and suitable for reading aloud."""
+        Keep the script concise, around 300-500 words, and suitable for reading aloud."""
 
         return self.investigative_journalist_agent(prompt)
 
@@ -187,7 +187,7 @@ class Oriana:
                         "content": prompt
                     }
                 ],
-                max_tokens=500,
+                max_tokens=800,
                 temperature=0.7,
             )
             return response.choices[0].message.content
