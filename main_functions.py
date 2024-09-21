@@ -42,19 +42,40 @@ class Oriana:
 
     def search_source(self, query, source):
         try:
-            result = exa_client.search_and_contents(
-                f"{query} from {source}",
-                num_results=5,
-                use_autoprompt=True
-            )
-            return [{
-                'url': item.url,
-                'content': item.title,
-                'timestamp': item.published_date
-            } for item in result.results if source in item.url]
+            content = self.scrape_specific_url(source)
+        
+            # Simple keyword matching (you might want to implement a more sophisticated search algorithm)
+            if query.lower() in content.lower():
+                return [{
+                    'url': source,
+                    'content': content,
+                    'timestamp': datetime.now().isoformat()  # Using current time as we don't have a published date
+                }]
+            else:
+                return []  # Return empty list if query not found in content
         except Exception as e:
             print(f"Error searching {source}: {str(e)}")
             return []
+
+def scrape_specific_url(self, url):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        for script in soup(["script", "style", "meta", "noscript", "header", "footer"]):
+            script.decompose()
+        
+        content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
+        content = re.sub(r'\s+', ' ', content).strip()
+        
+        return content
+    except Exception as e:
+        print(f"Error scraping {url}: {str(e)}")
+        return f"Unable to retrieve content from {url}"
 
     def scrape_specific_url(self, url):
         headers = {
