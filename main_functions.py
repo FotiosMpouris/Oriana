@@ -141,7 +141,7 @@ class Oriana:
         summaries = []
         for article in articles[:max_articles]:
             try:
-                prompt = f"""Summarize the following article in 3-4 sentences:
+                prompt = f"""Summarize the following article in 2-3 paragraphs:
 
                 Title: {article['title']}
                 Content: {article['content'][:3000]}  # Use the first 3000 characters of the full content
