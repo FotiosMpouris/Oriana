@@ -89,7 +89,7 @@ if st.button("Generate Transcript"):
 st.header("Search Recent Articles")
 search_subject = st.text_input("Enter a subject to search for recent articles:")
 search_sources = st.multiselect("Select news sources for recent articles:", oriana.sources)
-max_articles = st.slider("Maximum number of articles to summarize", min_value=1, max_value=10, value=5)
+max_articles = st.slider("Maximum number of articles to summarize", min_value=1, max_value=1, value=1)
 
 if st.button("Search and Summarize Recent Articles"):
     with st.spinner("Searching for and summarizing recent articles..."):
