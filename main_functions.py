@@ -111,29 +111,16 @@ class Oriana:
 
     def get_webpage_articles(self, subject, url):
         try:
-            # Scrape the homepage
-            response = requests.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Find all links that might be articles
-            links = soup.find_all('a', href=True)
-            
-            matching_articles = []
-            for link in links:
-                article_url = urljoin(url, link['href'])
-                # Basic check to filter out non-article links
-                if '/article/' in article_url or '/news/' in article_url:
-                    article = self.extract_article(article_url)
-                    if subject.lower() in article['title'].lower() or subject.lower() in article['text'].lower():
-                        matching_articles.append({
-                            'title': article['title'],
-                            'url': article_url,
-                            'content': article['text'],
-                            'published_date': article['publish_date'] or 'Date not available',
-                            'source': url
-                        })
-            
-            return matching_articles[:5]  # Limit to 5 articles for performance
+            article = self.extract_article(url)
+            if subject.lower() in article['text'].lower():
+                return [{
+                    'title': article['title'],
+                    'url': url,
+                    'content': article['text'],
+                    'published_date': article['publish_date'] or datetime.now().isoformat(),
+                    'source': url
+                }]
+            return []
         except Exception as e:
             print(f"Error processing webpage {url}: {str(e)}")
             return []
@@ -252,7 +239,6 @@ class Oriana:
             return response.choices[0].message.content
         except Exception as e:
             return f"Error in investigative_journalist_agent: {str(e)}"
-
 # import os
 # from dotenv import load_dotenv
 # from groq import Groq
