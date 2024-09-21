@@ -132,5 +132,3 @@ st.write("Here are some helpful links for more information:")
 st.write("- [News Source](https://www.c-span.org/)")
 st.write("- [Relevant News Coverage](https://www.latinorebels.com/)")
 st.write("- [News Analysis Guide](https://www.jeffsachs.org/)")
-# import streamlit as st
-# from main_functions import NewsNanny
