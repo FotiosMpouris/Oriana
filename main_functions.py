@@ -106,6 +106,11 @@ class Oriana:
             content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
             content = re.sub(r'\s+', ' ', content).strip()
             
+            return content
+        except Exception as e:
+            print(f"Error scraping {url}: {str(e)}")
+            return f"Unable to retrieve content from {url}"
+
     def get_webpage_articles(self, subject, url):
         try:
             article = self.extract_article(url)
@@ -173,7 +178,7 @@ class Oriana:
 
         Provide a concise summary that captures the main points of the article, especially those related to the key points mentioned above. If any key points are not addressed in the article, mention that they were not found in the content."""
 
-        return self.investigative_journalist_agent(prompt)   
+        return self.investigative_journalist_agent(prompt)
 
     def generate_news_transcript(self, selected_answers, max_answers=5):
         transcript = "News Transcript:\n\n"
