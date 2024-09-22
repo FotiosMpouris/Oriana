@@ -105,7 +105,6 @@ class Oriana:
             
             content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
             content = re.sub(r'\s+', ' ', content).strip()
-
             
     def get_webpage_articles(self, subject, url):
         try:
@@ -123,7 +122,6 @@ class Oriana:
             print(f"Error processing webpage {url}: {str(e)}")
             return []
 
-    
     def extract_article(self, url):
         article = Article(url)
         article.download()
