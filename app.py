@@ -39,8 +39,10 @@ if 'general_transcript' not in st.session_state:
 if 'selected_answers' not in st.session_state:
     st.session_state.selected_answers = []
 
-# Let Oriana Read and Summarize your Article
-st.header("Let Oriana Read and Summarize your Article")
+# Section 1: Let Oriana Read and Summarize your Article
+st.markdown("## Let Oriana Read and Summarize your Article")
+st.markdown("---")  # Visual separator
+
 selected_source = st.selectbox("Select source:", oriana.sources)
 
 keywords = st.text_input("Add keywords or phrases about your article (separate multiple entries with commas):")
@@ -62,8 +64,8 @@ if keywords:
     st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
     st.write("Add up to 5 article summaries to transcript.")
 
-# Generate Transcript and News Script
-st.header("Generate Transcript and News Script")
+# Generate Transcript and News Script (as a subcategory)
+st.markdown("### Generate Transcript and News Script")
 if st.button("Generate Transcript and News Script"):
     if st.session_state.selected_answers:
         with st.spinner("Generating transcript and news script..."):
@@ -79,7 +81,10 @@ if st.button("Generate Transcript and News Script"):
     else:
         st.warning("Please add some article summaries to the transcript first.")
 
-st.header("Summarize your article")
+# Section 2: Summarize your article(s)
+st.markdown("## Summarize your article(s)")
+st.markdown("---")  # Visual separator
+
 article_urls = st.text_area("Enter news source URLs (one per line, up to 5):")
 
 if st.button("Summarize Articles"):
@@ -101,12 +106,20 @@ if st.button("Summarize Articles"):
                     st.write(f"### [{article['title']}]({article['url']})")
                     st.write(f"**Published:** {article['published_date']} | **Source:** {article['source']}")
                     st.write(f"**Summary:** {article['summary']}")
+                    if st.button(f"Add to Transcript: {article['title'][:30]}..."):
+                        if len(st.session_state.selected_answers) < 5:
+                            st.session_state.selected_answers.append(f"{article['source']}: {article['summary']}")
+                            st.success(f"Summary of '{article['title']}' added to transcript.")
+                        else:
+                            st.warning("You've reached the limit of 5 article summaries in the transcript.")
                     st.write("---")
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
 
-# Additional Resources
-st.header("Additional Resources")
+# Section 3: Additional Resources
+st.markdown("## Additional Resources")
+st.markdown("---")  # Visual separator
+
 st.write("Add useful news sites for quick access to article URLs:")
 
 new_resource = st.text_input("Enter a new resource URL:")
