@@ -67,15 +67,23 @@ class Oriana:
     def get_resources(self):
         return self.resources
 
-    def search_source(self, query, source):
+    def search_source(self, keywords, source):
         try:
             content = self.scrape_specific_url(source)
             
-            if query.lower() in content.lower():
+            # Split keywords and create a regex pattern
+            keyword_list = [keyword.strip().lower() for keyword in keywords.split(',')]
+            pattern = '|'.join(r'\b{}\b'.format(re.escape(keyword)) for keyword in keyword_list)
+            
+            # Search for keywords in the content
+            matches = re.findall(pattern, content.lower())
+            
+            if matches:
                 return [{
                     'url': source,
                     'content': content,
-                    'timestamp': datetime.now().isoformat()
+                    'timestamp': datetime.now().isoformat(),
+                    'matches': matches
                 }]
             else:
                 return []
@@ -98,10 +106,42 @@ class Oriana:
             content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
             content = re.sub(r'\s+', ' ', content).strip()
             
-            return content
-        except Exception as e:
-            print(f"Error scraping {url}: {str(e)}")
-            return f"Unable to retrieve content from {url}"
+
+    # def search_source(self, query, source):
+    #     try:
+    #         content = self.scrape_specific_url(source)
+            
+    #         if query.lower() in content.lower():
+    #             return [{
+    #                 'url': source,
+    #                 'content': content,
+    #                 'timestamp': datetime.now().isoformat()
+    #             }]
+    #         else:
+    #             return []
+    #     except Exception as e:
+    #         print(f"Error searching {source}: {str(e)}")
+    #         return []
+
+    # def scrape_specific_url(self, url):
+    #     headers = {
+    #         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+    #     }
+    #     try:
+    #         response = requests.get(url, headers=headers, timeout=10)
+    #         response.raise_for_status()
+    #         soup = BeautifulSoup(response.text, 'html.parser')
+            
+    #         for script in soup(["script", "style", "meta", "noscript", "header", "footer"]):
+    #             script.decompose()
+            
+    #         content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
+    #         content = re.sub(r'\s+', ' ', content).strip()
+            
+    #         return content
+    #     except Exception as e:
+    #         print(f"Error scraping {url}: {str(e)}")
+    #         return f"Unable to retrieve content from {url}"
 
     def get_webpage_articles(self, subject, url):
         try:
@@ -157,17 +197,37 @@ class Oriana:
         results = self.search_source(keywords, source)
         
         if not results:
-            return f"No relevant information found from the selected source ({source})."
+            return f"No relevant information found from the selected source ({source}) using the provided keywords: {keywords}. Please try different keywords or check if the article content matches your search terms."
     
+        content = results[0]['content']
+        matches = results[0]['matches']
+        
         prompt = f"""Based on the following information from {source}:
 
-        {results[0]['content']}
+        {content[:3000]}  # Limit content to first 3000 characters to avoid token limits
 
-        Summarize the article using these keywords as guidance: {keywords}
+        Summarize the article, focusing on the following key points: {', '.join(matches)}
 
-        Provide a concise summary that captures the main points of the article."""
+        Provide a concise summary that captures the main points of the article, especially those related to the key points mentioned above. If any key points are not addressed in the article, mention that they were not found in the content."""
 
         return self.investigative_journalist_agent(prompt)
+
+
+    # def answer_question(self, keywords, source):
+    #     results = self.search_source(keywords, source)
+        
+    #     if not results:
+    #         return f"No relevant information found from the selected source ({source})."
+    
+    #     prompt = f"""Based on the following information from {source}:
+
+    #     {results[0]['content']}
+
+    #     Summarize the article using these keywords as guidance: {keywords}
+
+    #     Provide a concise summary that captures the main points of the article."""
+
+    #     return self.investigative_journalist_agent(prompt)
 
     def generate_news_transcript(self, selected_answers, max_answers=5):
         transcript = "News Transcript:\n\n"
