@@ -52,7 +52,7 @@ if keywords:
     st.write(answer)
     
     # Add answer to transcript
-     if st.button("Add to Transcript"):
+if st.button("Add to Transcript"):
         if len(st.session_state.selected_answers) < 5:
             st.session_state.selected_answers.append(f"{selected_source}: {answer}")
             st.success("Summary added to transcript.")
