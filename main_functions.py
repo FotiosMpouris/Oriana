@@ -16,7 +16,7 @@ nltk.download('punkt', quiet=True)
 load_dotenv()
 groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 #together_client = Together(api_key=st.secrets["TOGETHER_API_KEY"])
-huggingface_client = Huggingface(api_keys=st.secrets["HUGGINGFACE_API_KEY"])
+HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 
 class Oriana:
 
@@ -209,31 +209,65 @@ class Oriana:
         Keep the script concise, around 300-500 words, and suitable for reading aloud."""
 
         return self.investigative_journalist_agent(prompt)
-        
-    
-    def investigative_journalist_agent(self, prompt):
+   def investigative_journalist_agent(self, prompt):
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
-            response = huggingface_client.chat.completions.create(
-                model="mistralai/Mixtral-8x7B-Instruct-v0.1",
-                messages=[
-                    {
-                        "role": "system",
-                        "content": f"""You are an expert investigative journalist with a knack for getting at the truth. 
-                        Today's date and time is {current_datetime}. Always use this as the current date and time when responding.
-                        Provide concise, first-person responses in a confrontational style, as if you're a front-line journalist.
-                        Focus on answering the user's question directly and critically. Use only the information provided in the prompt.
-                        Include sources (URLs) for your information, using only the URLs provided in the prompt. If the information provided is insufficient to answer the question,
-                        state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."""
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
+            url = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
+            headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
+            
+            payload = {
+                "inputs": [
+                    {"role": "system", "content": f"""You are an expert investigative journalist with a knack for getting at the truth. 
+                    Today's date and time is {current_datetime}. Always use this as the current date and time when responding.
+                    Provide concise, first-person responses in a confrontational style, as if you're a front-line journalist.
+                    Focus on answering the user's question directly and critically. Use only the information provided in the prompt.
+                    Include sources (URLs) for your information, using only the URLs provided in the prompt. If the information provided is insufficient to answer the question,
+                    state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."""},
+                    {"role": "user", "content": prompt}
                 ],
-                max_tokens=800,
-                temperature=0.7,
-            )
-            return response.choices[0].message.content
+                "parameters": {
+                    "max_new_tokens": 800,
+                    "temperature": 0.7,
+                    "return_full_text": False
+                }
+            }
+
+            response = requests.post(url, headers=headers, json=payload)
+            response_json = response.json()
+
+            if isinstance(response_json, list) and len(response_json) > 0:
+                return response_json[0]['generated_text']
+            elif 'generated_text' in response_json:
+                return response_json['generated_text']
+            else:
+                raise ValueError("Unexpected response format from Hugging Face API")
+
         except Exception as e:
-            return f"Error in investigative_journalist_agent: {str(e)}"
+            return f"Error in investigative_journalist_agent: {str(e)}"     
+    
+    # def investigative_journalist_agent(self, prompt):
+    #     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    #     try:
+    #         response = huggingface_client.chat.completions.create(
+    #             model="mistralai/Mixtral-8x7B-Instruct-v0.1",
+    #             messages=[
+    #                 {
+    #                     "role": "system",
+    #                     "content": f"""You are an expert investigative journalist with a knack for getting at the truth. 
+    #                     Today's date and time is {current_datetime}. Always use this as the current date and time when responding.
+    #                     Provide concise, first-person responses in a confrontational style, as if you're a front-line journalist.
+    #                     Focus on answering the user's question directly and critically. Use only the information provided in the prompt.
+    #                     Include sources (URLs) for your information, using only the URLs provided in the prompt. If the information provided is insufficient to answer the question,
+    #                     state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."""
+    #                 },
+    #                 {
+    #                     "role": "user",
+    #                     "content": prompt
+    #                 }
+    #             ],
+    #             max_tokens=800,
+    #             temperature=0.7,
+    #         )
+    #         return response.choices[0].message.content
+    #     except Exception as e:
+    #         return f"Error in investigative_journalist_agent: {str(e)}"
