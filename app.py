@@ -43,7 +43,6 @@ if 'selected_answers' not in st.session_state:
 st.header("Let Oriana Read and Summarize your Article")
 selected_source = st.selectbox("Select source:", oriana.sources)
 
-
 keywords = st.text_input("Add keywords or phrases about your article (separate multiple entries with commas):")
 if keywords:
     with st.spinner("Investigating..."):
@@ -52,7 +51,7 @@ if keywords:
     st.write(answer)
     
     # Add answer to transcript
-if st.button("Add to Transcript"):
+    if st.button("Add to Transcript"):
         if len(st.session_state.selected_answers) < 5:
             st.session_state.selected_answers.append(f"{selected_source}: {answer}")
             st.success("Summary added to transcript.")
@@ -60,7 +59,7 @@ if st.button("Add to Transcript"):
             st.warning("You've reached the limit of 5 article summaries in the transcript.")
     
     # Display transcript counter
-   st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
+    st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
     st.write("Add up to 5 article summaries to transcript.")
 
 # Generate Transcript and News Script
