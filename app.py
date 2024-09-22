@@ -33,9 +33,7 @@ with st.sidebar.expander("ℹ️ Learn More"):
     Let Oriana be your guide in the fast-paced world of information!
     """)
 
-# Initialize session state to store the general transcript and selected answers
-if 'general_transcript' not in st.session_state:
-    st.session_state.general_transcript = ""
+# Initialize session state
 if 'selected_answers' not in st.session_state:
     st.session_state.selected_answers = []
 
@@ -53,16 +51,13 @@ if keywords:
     st.write(answer)
     
     # Add answer to transcript
-    if st.button("Add to Transcript"):
+    if st.button("Add to Transcript", key="add_summary_to_transcript"):
         if len(st.session_state.selected_answers) < 5:
             st.session_state.selected_answers.append(f"{selected_source}: {answer}")
             st.success("Summary added to transcript.")
+            st.experimental_rerun()
         else:
             st.warning("You've reached the limit of 5 article summaries in the transcript.")
-    
-    # Display transcript counter
-    st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
-    st.write("Add up to 5 article summaries to transcript.")
 
 # Generate Transcript and News Script (as a subcategory)
 st.markdown("### Generate Transcript and News Script")
@@ -101,20 +96,29 @@ if st.button("Summarize Articles"):
             if not summarized_articles:
                 st.warning("No articles found. Please check your URLs and try again.")
             else:
-                st.subheader(f"Summarized Articles")
-                for article in summarized_articles:
-                    st.write(f"### [{article['title']}]({article['url']})")
-                    st.write(f"**Published:** {article['published_date']} | **Source:** {article['source']}")
-                    st.write(f"**Summary:** {article['summary']}")
-                    if st.button(f"Add to Transcript: {article['title'][:30]}..."):
-                        if len(st.session_state.selected_answers) < 5:
-                            st.session_state.selected_answers.append(f"{article['source']}: {article['summary']}")
-                            st.success(f"Summary of '{article['title']}' added to transcript.")
-                        else:
-                            st.warning("You've reached the limit of 5 article summaries in the transcript.")
-                    st.write("---")
+                st.session_state.summarized_articles = summarized_articles
+                st.experimental_rerun()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
+
+if 'summarized_articles' in st.session_state:
+    st.subheader(f"Summarized Articles")
+    for i, article in enumerate(st.session_state.summarized_articles):
+        st.write(f"### [{article['title']}]({article['url']})")
+        st.write(f"**Published:** {article['published_date']} | **Source:** {article['source']}")
+        st.write(f"**Summary:** {article['summary']}")
+        if st.button(f"Add to Transcript: {article['title'][:30]}...", key=f"add_to_transcript_{i}"):
+            if len(st.session_state.selected_answers) < 5:
+                st.session_state.selected_answers.append(f"{article['source']}: {article['summary']}")
+                st.success(f"Summary of '{article['title']}' added to transcript.")
+                st.experimental_rerun()
+            else:
+                st.warning("You've reached the limit of 5 article summaries in the transcript.")
+        st.write("---")
+
+# Display transcript counter
+st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
+st.write("Add up to 5 article summaries to transcript.")
 
 # Section 3: Additional Resources
 st.markdown("## Additional Resources")
