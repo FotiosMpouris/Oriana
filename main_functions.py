@@ -105,22 +105,38 @@ class Oriana:
             
             content = ' '.join([p.get_text() for p in soup.find_all(['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li'])])
             content = re.sub(r'\s+', ' ', content).strip()
-            
+
     def get_webpage_articles(self, subject, url):
-        try:
-            article = self.extract_article(url)
-            if subject.lower() in article['text'].lower():
-                return [{
-                    'title': article['title'],
-                    'url': url,
-                    'content': article['text'],
-                    'published_date': article['publish_date'] or datetime.now().isoformat(),
-                    'source': url
-                }]
-            return []
-        except Exception as e:
-            print(f"Error processing webpage {url}: {str(e)}")
-            return []
+    try:
+        article = self.extract_article(url)
+        if subject.lower() in article['text'].lower():
+            return [{
+                'title': article['title'],
+                'url': url,
+                'content': article['text'],
+                'published_date': article['publish_date'] or datetime.now().isoformat(),
+                'source': url
+            }]
+        return []
+    except Exception as e:
+        print(f"Error processing webpage {url}: {str(e)}")
+        return []
+            
+    # def get_webpage_articles(self, subject, url):
+    #     try:
+    #         article = self.extract_article(url)
+    #         if subject.lower() in article['text'].lower():
+    #             return [{
+    #                 'title': article['title'],
+    #                 'url': url,
+    #                 'content': article['text'],
+    #                 'published_date': article['publish_date'] or datetime.now().isoformat(),
+    #                 'source': url
+    #             }]
+    #         return []
+    #     except Exception as e:
+    #         print(f"Error processing webpage {url}: {str(e)}")
+    #         return []
 
     def extract_article(self, url):
         article = Article(url)
@@ -131,6 +147,16 @@ class Oriana:
             'text': article.text,
             'publish_date': article.publish_date
         }
+
+    # def extract_article(self, url):
+    #     article = Article(url)
+    #     article.download()
+    #     article.parse()
+    #     return {
+    #         'title': article.title,
+    #         'text': article.text,
+    #         'publish_date': article.publish_date
+    #     }
 
     def summarize_articles(self, articles, max_articles=5):
         summaries = []
