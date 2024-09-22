@@ -37,6 +37,11 @@ with st.sidebar.expander("ℹ️ Learn More"):
 if 'selected_answers' not in st.session_state:
     st.session_state.selected_answers = []
 
+# Function to display transcript counter
+def display_transcript_counter():
+    st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
+    st.write("Add up to 5 article summaries to transcript.")
+
 # Section 1: Let Oriana Read and Summarize your Article
 st.markdown("## Let Oriana Read and Summarize your Article")
 st.markdown("---")  # Visual separator
@@ -55,9 +60,12 @@ if keywords:
         if len(st.session_state.selected_answers) < 5:
             st.session_state.selected_answers.append(f"{selected_source}: {answer}")
             st.success("Summary added to transcript.")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("You've reached the limit of 5 article summaries in the transcript.")
+
+# Display transcript counter in Section 1
+display_transcript_counter()
 
 # Generate Transcript and News Script (as a subcategory)
 st.markdown("### Generate Transcript and News Script")
@@ -97,7 +105,7 @@ if st.button("Summarize Articles"):
                 st.warning("No articles found. Please check your URLs and try again.")
             else:
                 st.session_state.summarized_articles = summarized_articles
-                st.experimental_rerun()
+                st.rerun()
         except Exception as e:
             st.error(f"An error occurred: {str(e)}")
 
@@ -111,14 +119,13 @@ if 'summarized_articles' in st.session_state:
             if len(st.session_state.selected_answers) < 5:
                 st.session_state.selected_answers.append(f"{article['source']}: {article['summary']}")
                 st.success(f"Summary of '{article['title']}' added to transcript.")
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.warning("You've reached the limit of 5 article summaries in the transcript.")
         st.write("---")
 
-# Display transcript counter
-st.write(f"Current number of summaries in transcript: {len(st.session_state.selected_answers)}/5")
-st.write("Add up to 5 article summaries to transcript.")
+# Display transcript counter in Section 2
+display_transcript_counter()
 
 # Section 3: Additional Resources
 st.markdown("## Additional Resources")
@@ -142,7 +149,7 @@ for name, url in resources.items():
         if st.button(f"Confirm removal of {name}", key=f"confirm_resource_{name}"):
             oriana.remove_resource(name)
             st.success(f"Removed resource: {name}")
-            st.experimental_rerun()
+            st.rerun()
 
 st.write("Use these resources to find article URLs for summarization.")
 
