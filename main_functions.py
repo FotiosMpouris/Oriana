@@ -65,9 +65,9 @@ class Oriana:
     #         self.sources.remove(url)
     #         self.save_sources()
     def remove_source(self, url):
-    if url in self.sources:
-        self.sources.remove(url)
-        self.save_sources()  # 
+        if url in self.sources:
+            self.sources.remove(url)
+            self.save_sources()  # 
 
 
     def remove_resource(self, name):
