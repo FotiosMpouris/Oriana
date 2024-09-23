@@ -239,7 +239,7 @@ class Oriana:
             if response.status_code != 200:
                 return f"Error: API returned status code {response.status_code}. Response: {response.text}"
 
-           response_json = response.json()
+            response_json = response.json()
 
             if isinstance(response_json, list) and len(response_json) > 0:
                 return response_json[0]['generated_text']
