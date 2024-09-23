@@ -5,12 +5,21 @@ from main_functions import Oriana
 oriana = Oriana()
 
 # Custom title with larger font and smaller tagline
+# st.markdown("""
+#     <h1 style='font-size: 3em;'>Oriana</h1>
+#     <h3 style='font-size: 1.5em; font-weight: normal;'>Your AI-Powered Investigative Journalist</h3>
+#     """, unsafe_allow_html=True)
 st.markdown("""
     <h1 style='font-size: 3em;'>Oriana</h1>
     <h3 style='font-size: 1.5em; font-weight: normal;'>Your AI-Powered Investigative Journalist</h3>
     """, unsafe_allow_html=True)
 
 # Sidebar content
+# st.sidebar.header("Add News Source")
+# new_source = st.sidebar.text_input("Enter a new source URL:")
+# if st.sidebar.button("Add Source"):
+#     oriana.add_source(new_source)
+#     st.sidebar.success(f"Added source: {new_source}")
 st.sidebar.header("Add News Source")
 new_source = st.sidebar.text_input("Enter a new source URL:")
 if st.sidebar.button("Add Source"):
@@ -18,9 +27,18 @@ if st.sidebar.button("Add Source"):
     st.sidebar.success(f"Added source: {new_source}")
 
 # Display current sources
+# st.sidebar.header("Current Sources")
+# for source in oriana.sources:
+#     st.sidebar.text(source)
 st.sidebar.header("Current Sources")
 for source in oriana.sources:
-    st.sidebar.text(source)
+    col1, col2 = st.sidebar.columns([3, 1])
+    col1.write(source)
+    if col2.button("X", key=f"remove_{source}"):
+        if st.sidebar.button("Done with this?", key=f"confirm_{source}"):
+            oriana.remove_source(source)
+            st.sidebar.success(f"Removed source: {source}")
+            st.rerun()
 
 # About Oriana in sidebar
 st.sidebar.header("About Oriana")
@@ -88,7 +106,8 @@ if st.button("Generate Transcript and News Script"):
 st.markdown("## Summarize your article(s)")
 st.markdown("---")  # Visual separator
 
-article_urls = st.text_area("Enter news source URLs (one per line, up to 5):")
+#article_urls = st.text_area("Enter news source URLs (one per line, up to 5):")
+article_urls = st.text_area("Enter Article/Document URL(s) (one per line, up to 5):")
 
 if st.button("Summarize Articles"):
     with st.spinner("Summarizing articles..."):
