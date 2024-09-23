@@ -47,14 +47,29 @@ class Oriana:
     #         self.sources.remove(url)
     #         self.save_sources()
     def remove_source(self, url):
+        logging.info(f"Attempting to remove source: {url}")
+        logging.info(f"Current sources before removal: {self.sources}")
+        
         if url in self.sources:
             self.sources.remove(url)
-            with open('sources.json', 'w') as f:
-                json.dump(self.sources, f)
-            logging.info(f"Removed source: {url}")
-            logging.info(f"Updated sources: {self.sources}")
+            logging.info(f"Source removed from self.sources. Updated sources: {self.sources}")
+            
+            try:
+                with open('sources.json', 'w') as f:
+                    json.dump(self.sources, f)
+                logging.info("sources.json updated successfully")
+            except Exception as e:
+                logging.error(f"Error updating sources.json: {str(e)}")
         else:
-            logging.warning(f"Attempted to remove non-existent source: {url}")
+            logging.warning(f"Source not found in self.sources: {url}")
+        
+        # Verify file contents after operation
+        try:
+            with open('sources.json', 'r') as f:
+                file_contents = json.load(f)
+            logging.info(f"Contents of sources.json after operation: {file_contents}")
+        except Exception as e:
+            logging.error(f"Error reading sources.json after operation: {str(e)}")
 
     def load_resources(self):
         try:
