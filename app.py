@@ -48,14 +48,20 @@ for source in oriana.sources:
     if col2.button("X", key=f"remove_{source}"):
         if st.sidebar.button("Done with this?", key=f"confirm_{source}"):
             try:
-                oriana.remove_source(source)
+                updated_sources = oriana.remove_source(source)
                 st.sidebar.success(f"Removed source: {source}")
+                st.session_state.oriana_sources = updated_sources  # Update session state
                 time.sleep(1)
                 st.rerun()
             except Exception as e:
                 st.sidebar.error(f"Error removing source: {str(e)}")
                 logging.error(f"Error removing source {source}: {str(e)}")
 
+# Use session state to display sources
+if 'oriana_sources' not in st.session_state:
+    st.session_state.oriana_sources = oriana.sources
+
+st.sidebar.write("Current sources:", st.session_state.oriana_sources)
 if st.sidebar.checkbox("Show Debug Info"):
     st.sidebar.write("Current sources:", oriana.sources)
     st.sidebar.write("Sources file content:")
