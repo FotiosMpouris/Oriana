@@ -43,7 +43,7 @@ st.markdown("""
         margin-right: 10px;
     }
     .logo-title img {
-        height: 1em;
+        height: 5em;
         width: auto;
     }
     .tagline {
