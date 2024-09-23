@@ -1,7 +1,11 @@
 import streamlit as st
 from main_functions import Oriana
 import time
-import json  
+import json
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 # Initialize Oriana
 oriana = Oriana()
@@ -39,10 +43,14 @@ for source in oriana.sources:
     col1.write(source)
     if col2.button("X", key=f"remove_{source}"):
         if st.sidebar.button("Done with this?", key=f"confirm_{source}"):
-            oriana.remove_source(source)
-            st.sidebar.success(f"Removed source: {source}")
-            time.sleep(1)  # Give user time to see the success message
-            st.rerun()  # F
+            try:
+                oriana.remove_source(source)
+                st.sidebar.success(f"Removed source: {source}")
+                time.sleep(1)
+                st.rerun()
+            except Exception as e:
+                st.sidebar.error(f"Error removing source: {str(e)}")
+                logging.error(f"Error removing source {source}: {str(e)}")
 
 if st.sidebar.checkbox("Show Debug Info"):
     st.sidebar.write("Current sources:", oriana.sources)
@@ -52,6 +60,9 @@ if st.sidebar.checkbox("Show Debug Info"):
             st.sidebar.json(json.load(f))
     except FileNotFoundError:
         st.sidebar.write("sources.json file not found.")
+    except json.JSONDecodeError:
+        st.sidebar.write("sources.json is empty or not valid JSON.")
+
 
 # About Oriana in sidebar
 st.sidebar.header("About Oriana")
