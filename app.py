@@ -1,5 +1,7 @@
 import streamlit as st
 from main_functions import Oriana
+import time
+import json  
 
 # Initialize Oriana
 oriana = Oriana()
@@ -25,6 +27,7 @@ new_source = st.sidebar.text_input("Enter a new source URL:")
 if st.sidebar.button("Add Source"):
     oriana.add_source(new_source)
     st.sidebar.success(f"Added source: {new_source}")
+    st.rerun()
 
 # Display current sources
 # st.sidebar.header("Current Sources")
@@ -38,7 +41,17 @@ for source in oriana.sources:
         if st.sidebar.button("Done with this?", key=f"confirm_{source}"):
             oriana.remove_source(source)
             st.sidebar.success(f"Removed source: {source}")
-            st.rerun()
+            time.sleep(1)  # Give user time to see the success message
+            st.rerun()  # F
+
+if st.sidebar.checkbox("Show Debug Info"):
+    st.sidebar.write("Current sources:", oriana.sources)
+    st.sidebar.write("Sources file content:")
+    try:
+        with open('sources.json', 'r') as f:
+            st.sidebar.json(json.load(f))
+    except FileNotFoundError:
+        st.sidebar.write("sources.json file not found.")
 
 # About Oriana in sidebar
 st.sidebar.header("About Oriana")
