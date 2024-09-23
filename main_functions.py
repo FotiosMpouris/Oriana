@@ -11,6 +11,8 @@ import json
 from newspaper import Article
 import nltk
 nltk.download('punkt', quiet=True)
+print(f"Current working directory: {os.getcwd()}")
+print(f"Full path of sources.json: {os.path.abspath('sources.json')}")
 
 # Load environment variables and initialize clients
 load_dotenv()
