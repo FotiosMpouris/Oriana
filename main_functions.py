@@ -234,17 +234,31 @@ class Oriana:
             }
 
             response = requests.post(url, headers=headers, json=payload)
-            response_json = response.json()
+            
+            # Print status code and response content for debugging
+            print(f"Status Code: {response.status_code}")
+            print(f"Response Content: {response.text}")
+
+            if response.status_code != 200:
+                return f"Error: API returned status code {response.status_code}. Response: {response.text}"
+
+            try:
+                response_json = response.json()
+            except json.JSONDecodeError as json_err:
+                return f"Error: Unable to parse JSON response. Raw response: {response.text}. JSON error: {str(json_err)}"
 
             if isinstance(response_json, list) and len(response_json) > 0:
                 return response_json[0]['generated_text']
             elif 'generated_text' in response_json:
                 return response_json['generated_text']
             else:
-                raise ValueError("Unexpected response format from Hugging Face API")
+                return f"Error: Unexpected response format. Response: {response_json}"
 
+        except requests.RequestException as req_err:
+            return f"Error: Request to Hugging Face API failed. {str(req_err)}"
         except Exception as e:
-            return f"Error in investigative_journalist_agent: {str(e)}"     
+            return f"Error in investigative_journalist_agent: {str(e)}"
+
     
     # def investigative_journalist_agent(self, prompt):
     #     current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
