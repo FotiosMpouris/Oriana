@@ -38,13 +38,13 @@ st.markdown("""
         display: flex;
         align-items: center;
     }
-    .logo-title h1 {
-        font-size: 3em;
-        margin-right: 10px;
-    }
     .logo-title img {
         height: 5em;
         width: auto;
+        margin-right: 10px;
+    }
+    .logo-title h1 {
+        font-size: 3em;
     }
     .tagline {
         font-size: 1.5em;
@@ -58,8 +58,8 @@ if logo_path:
     logo_base64 = get_base64_of_bin_file(logo_path)
     st.markdown(f"""
         <div class="logo-title">
-            <h1>Oriana</h1>
             <img src="data:image/png;base64,{logo_base64}" alt="Oriana logo">
+            <h1>Oriana</h1>
         </div>
         <h3 class="tagline">Your AI-Powered Investigative Journalist</h3>
         """, unsafe_allow_html=True)
