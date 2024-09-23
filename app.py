@@ -26,7 +26,7 @@ if st.sidebar.button("Add Source"):
 
 # Display and remove sources
 st.sidebar.subheader("Current Sources")
-for source in oriana.sources:
+for source in oriana.get_sources():
     col1, col2 = st.sidebar.columns([3, 1])
     col1.write(source)
     if col2.button("Remove", key=f"remove_{source}"):
@@ -54,7 +54,7 @@ def display_transcript_counter():
 st.markdown("## Let Oriana Read and Summarize your Article")
 st.markdown("---")  # Visual separator
 
-selected_source = st.selectbox("Select source:", oriana.sources)
+selected_source = st.selectbox("Select source:", oriana.get_sources())
 
 keywords = st.text_input("Add keywords or phrases about your article (separate multiple entries with commas):")
 if keywords:
