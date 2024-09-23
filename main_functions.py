@@ -60,6 +60,12 @@ class Oriana:
         else:
             raise ValueError("Maximum number of resources (30) reached. Please remove some before adding more.")
 
+    def remove_source(self, url):
+        if url in self.sources:
+            self.sources.remove(url)
+            self.save_sources()
+
+
     def remove_resource(self, name):
         if name in self.resources:
             del self.resources[name]
