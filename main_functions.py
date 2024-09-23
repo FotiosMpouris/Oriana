@@ -42,6 +42,17 @@ class Oriana:
             self.sources.append(url)
             self.save_sources()
 
+    # def remove_source(self, url):
+    #     if url in self.sources:
+    #         self.sources.remove(url)
+    #         self.save_sources()
+    def remove_source(self, url):
+        if url in self.sources:
+            self.sources.remove(url)
+        # Explicitly save the updated sources to the JSON file
+            with open('sources.json', 'w') as f:
+                json.dump(self.sources, f)
+
     def load_resources(self):
         try:
             with open('resources.json', 'r') as f:
@@ -60,18 +71,7 @@ class Oriana:
         else:
             raise ValueError("Maximum number of resources (30) reached. Please remove some before adding more.")
 
-    # def remove_source(self, url):
-    #     if url in self.sources:
-    #         self.sources.remove(url)
-    #         self.save_sources()
-    def remove_source(self, url):
-        if url in self.sources:
-            self.sources.remove(url)
-        # Explicitly save the updated sources to the JSON file
-            with open('sources.json', 'w') as f:
-                json.dump(self.sources, f)
-
-
+    
     def remove_resource(self, name):
         if name in self.resources:
             del self.resources[name]
