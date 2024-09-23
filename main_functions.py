@@ -17,23 +17,16 @@ groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 
 class Oriana:
-
     def __init__(self):
-        self.sources = []
-        self.resources = {}
         self.load_sources()
-        self.load_resources()
 
     def load_sources(self):
-        try:
-            with open('sources.json', 'r') as f:
-                self.sources = json.load(f)
-        except FileNotFoundError:
-            self.sources = []
+        if 'sources' not in st.secrets:
+            st.secrets['sources'] = json.dumps([])
+        self.sources = json.loads(st.secrets['sources'])
 
     def save_sources(self):
-        with open('sources.json', 'w') as f:
-            json.dump(self.sources, f)
+        st.secrets['sources'] = json.dumps(self.sources)
 
     def add_source(self, url):
         if url and url not in self.sources:
@@ -44,6 +37,9 @@ class Oriana:
         if url in self.sources:
             self.sources.remove(url)
             self.save_sources()
+
+    def get_sources(self):
+        return self.sources
 
     def load_resources(self):
         try:
