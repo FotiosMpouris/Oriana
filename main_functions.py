@@ -209,7 +209,8 @@ class Oriana:
         Keep the script concise, around 300-500 words, and suitable for reading aloud."""
 
         return self.investigative_journalist_agent(prompt)
-       def investigative_journalist_agent(self, prompt):
+    
+    def investigative_journalist_agent(self, prompt):
         current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         try:
             url = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
