@@ -49,9 +49,12 @@ class Oriana:
     def remove_source(self, url):
         if url in self.sources:
             self.sources.remove(url)
-        # Explicitly save the updated sources to the JSON file
             with open('sources.json', 'w') as f:
                 json.dump(self.sources, f)
+            logging.info(f"Removed source: {url}")
+            logging.info(f"Updated sources: {self.sources}")
+        else:
+            logging.warning(f"Attempted to remove non-existent source: {url}")
 
     def load_resources(self):
         try:
