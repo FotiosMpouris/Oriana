@@ -7,8 +7,12 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
-# Initialize Oriana
-oriana = Oriana()
+@st.cache_resource(hash_funcs={Oriana: lambda _: None})
+def get_oriana_instance():
+    return Oriana()
+
+# Use this function to get the Oriana instance
+oriana = get_oriana_instance()
 
 # Custom title with larger font and smaller tagline
 # st.markdown("""
