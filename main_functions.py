@@ -9,6 +9,7 @@ import re
 from datetime import datetime
 import json
 from newspaper import Article
+import logging
 import nltk
 nltk.download('punkt', quiet=True)
 print(f"Current working directory: {os.getcwd()}")
@@ -57,21 +58,28 @@ class Oriana:
             logging.info(f"Source removed from self.sources. Updated sources: {self.sources}")
             
             try:
-                with open('sources.json', 'w') as f:
+                file_path = os.path.abspath('sources.json')
+                logging.info(f"Attempting to write to file: {file_path}")
+                
+                with open(file_path, 'w') as f:
                     json.dump(self.sources, f)
                 logging.info("sources.json updated successfully")
+                
+                # Verify file contents after operation
+                with open(file_path, 'r') as f:
+                    file_contents = json.load(f)
+                logging.info(f"Contents of sources.json after operation: {file_contents}")
+                
+                if url in file_contents:
+                    logging.error(f"Source {url} still present in file after removal!")
+                else:
+                    logging.info(f"Source {url} successfully removed from file.")
             except Exception as e:
                 logging.error(f"Error updating sources.json: {str(e)}")
         else:
             logging.warning(f"Source not found in self.sources: {url}")
         
-        # Verify file contents after operation
-        try:
-            with open('sources.json', 'r') as f:
-                file_contents = json.load(f)
-            logging.info(f"Contents of sources.json after operation: {file_contents}")
-        except Exception as e:
-            logging.error(f"Error reading sources.json after operation: {str(e)}")
+        return self.sources  # Return the updated sources list
 
     def load_resources(self):
         try:
