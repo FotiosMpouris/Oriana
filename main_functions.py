@@ -248,30 +248,30 @@ class Oriana:
         return self.investigative_journalist_agent(prompt)
     
     def investigative_journalist_agent(self, prompt):
-    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    system_message = (
-        f"You are an expert investigative journalist with a knack for getting at the truth. "
-        f"Today's date and time is {current_datetime}. Always use this as the current date and time when responding. "
-        "Provide concise, first-person responses in a confrontational style as if you're a front-line journalist. "
-        "Focus on answering the user's question directly and critically using only the information provided in the prompt. "
-        "Include sources (URLs) only if they are provided in the prompt. If the information is insufficient to answer the question, "
-        "state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."
-    )
-    
-    try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=800,
-            temperature=0.7,
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        system_message = (
+            f"You are an expert investigative journalist with a knack for getting at the truth. "
+            f"Today's date and time is {current_datetime}. Always use this as the current date and time when responding. "
+            "Provide concise, first-person responses in a confrontational style as if you're a front-line journalist. "
+            "Focus on answering the user's question directly and critically using only the information provided in the prompt. "
+            "Include sources (URLs) only if they are provided in the prompt. If the information is insufficient to answer the question, "
+            "state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."
         )
+    
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=800,
+                temperature=0.7,
+            )
         # Extract and return the assistant's reply
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"Error in investigative_journalist_agent: {str(e)}"
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            return f"Error in investigative_journalist_agent: {str(e)}"
 
 # import os
 # from dotenv import load_dotenv
