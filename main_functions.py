@@ -12,6 +12,10 @@ import logging
 import nltk
 from github import Github
 import base64
+import openai
+
+# Set your OpenAI API key (make sure you have added it to your Streamlit secrets or environment variables)
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 nltk.download('punkt', quiet=True)
 
@@ -244,47 +248,30 @@ class Oriana:
         return self.investigative_journalist_agent(prompt)
     
     def investigative_journalist_agent(self, prompt):
-        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        try:
-            url = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1"
-            headers = {"Authorization": f"Bearer {HUGGINGFACE_API_KEY}"}
-        
-            system_prompt = f"""You are an expert investigative journalist with a knack for getting at the truth. 
-            Today's date and time is {current_datetime}. Always use this as the current date and time when responding.
-            Provide concise, first-person responses in a confrontational style, as if you're a front-line journalist.
-            Focus on answering the user's question directly and critically. Use only the information provided in the prompt.
-            Include sources (URLs) for your information, using only the URLs provided in the prompt. If the information provided is insufficient to answer the question,
-            state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."""
-
-            full_prompt = f"{system_prompt}\n\nHuman: {prompt}\n\nAssistant:"
-        
-            payload = {
-                "inputs": full_prompt,
-                "parameters": {
-                    "max_new_tokens": 800,
-                    "temperature": 0.7,
-                    "return_full_text": False
-                }
-            }
-
-            response = requests.post(url, headers=headers, json=payload)
-        
-            if response.status_code != 200:
-                return f"Error: API returned status code {response.status_code}. Response: {response.text}"
-
-            response_json = response.json()
-
-            if isinstance(response_json, list) and len(response_json) > 0:
-                return response_json[0]['generated_text']
-            elif 'generated_text' in response_json:
-                return response_json['generated_text']
-            else:
-                return f"Error: Unexpected response format. Response: {response_json}"
-
-        except requests.RequestException as req_err:
-            return f"Error: Request to Hugging Face API failed. {str(req_err)}"
-        except Exception as e:
-            return f"Error in investigative_journalist_agent: {str(e)}"
+    current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    system_message = (
+        f"You are an expert investigative journalist with a knack for getting at the truth. "
+        f"Today's date and time is {current_datetime}. Always use this as the current date and time when responding. "
+        "Provide concise, first-person responses in a confrontational style as if you're a front-line journalist. "
+        "Focus on answering the user's question directly and critically using only the information provided in the prompt. "
+        "Include sources (URLs) only if they are provided in the prompt. If the information is insufficient to answer the question, "
+        "state this clearly. Avoid speculation or using external knowledge. Keep your answer under 400 words."
+    )
+    
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+            messages=[
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": prompt},
+            ],
+            max_tokens=800,
+            temperature=0.7,
+        )
+        # Extract and return the assistant's reply
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"Error in investigative_journalist_agent: {str(e)}"
 
 # import os
 # from dotenv import load_dotenv
