@@ -239,11 +239,11 @@ class Oriana:
 
         Generate a brief, engaging script that summarizes these stories. The script should:
         1. Start with a catchy introduction
-        2. Highlight the key points from each story
-        3. Connect any common themes or related information across the stories
+        2. Highlight the key points from each story if there is more than one story
+        3. Connect any common themes or related information across the stories or present for one story if there is only one
         4. Conclude with a thought-provoking statement or question
 
-        Keep the script concise, around 300-500 words, and suitable for reading aloud."""
+        Keep the script concise, ideally round 300-500 words, and suitable for reading aloud."""
 
         return self.investigative_journalist_agent(prompt)
     
