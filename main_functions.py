@@ -22,7 +22,7 @@ nltk.download('punkt', quiet=True)
 # Load environment variables and initialize clients
 load_dotenv()
 groq_client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
+#HUGGINGFACE_API_KEY = st.secrets["HUGGINGFACE_API_KEY"]
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
 GITHUB_REPO = st.secrets["GITHUB_REPO"]
 
