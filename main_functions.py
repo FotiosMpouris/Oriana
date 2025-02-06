@@ -233,14 +233,14 @@ class Oriana:
         if not answers:
             return "No stories to summarize."
     
-        prompt = f"""Based on the following news stories and Write in the style and vocabulary level of a high school aged student:
+        prompt = f"""Based on the following news stories and Write in the style and vocabulary level of a high school aged student, write for a newscast:
 
         {'\n'.join([f"Story {i+1}: {answer}" for i, answer in enumerate(answers)])}
 
         Generate a brief, engaging script that summarizes these stories. The script should:
         1. Start with a catchy introduction that emphasizes summary topic.
-        2. Highlight the key points from each story, and include both interwoven within a narrative script.
-        3. Connect any common themes or related information across the stories or present for one story if there is only one
+        2. Highlight the key points include them interwoven within a narrative script.
+        3. Connect any common themes or related information across the stories or present them fairly
         4. Conclude with a thought-provoking statement or question
         
         Keep the script concise, ideally round 300-500 words, and suitable for reading aloud."""
