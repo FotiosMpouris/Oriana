@@ -240,8 +240,8 @@ class Oriana:
         Generate a brief, engaging script that summarizes these stories. The script should:
         1. Start with a catchy introduction that emphasizes summary topic.
         2. Highlight the key points include them interwoven within a narrative script.
-        3. Connect any common themes or related information across the stories.
-        4. Conclude with a thought-provoking statement or question
+        3. Connect any common themes or related information.
+        4. Conclude with a thought-provoking statement or question.
         
         Keep the script concise, ideally round 300-500 words, and suitable for reading aloud."""
 
